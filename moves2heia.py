@@ -300,8 +300,8 @@ def main():
 	heiaheia_pw = None
 
 	if len(sys.argv) == 2 and sys.argv[1] == "-h":
-		print "Usage :%s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]" % sys.argv[0]
-		exit(0)
+		print "Usage: %s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]" % sys.argv[0]
+		sys.exit(0)
 
 	if len(sys.argv) > 1:
 		movescount_uname = sys.argv[1]
