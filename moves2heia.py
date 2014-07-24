@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, urllib, urllib2, poster, StringIO, datetime
+import sys, urllib, urllib2, poster, StringIO, datetime, os
 from HTMLParser import HTMLParser
 
 class Move:
@@ -292,16 +292,58 @@ def get_gpx(cookies, move):
 
 	move.gpx = gpx
 
-def main():
+def get_cookies():
+	# Reads cookies from local file
+	dr = ""
+	if "win" in sys.platform:
+		# Windows
+		dr = os.path.join(os.getenv('APPDATA'), "moves2heia")
+	else:
+		dr = os.path.join(os.path.expanduser("~"), ".moves2heia")
 
+	f = open(os.path.join(dr, "cookies"), "r")
+
+	mc_cookies = f.readline().strip().split("; ")
+	hh_cookie_str = f.readline().strip()
+	hh_token = f.readline().strip()
+
+	hh_cookie = {}
+	for entry in hh_cookie_str.split(", "):
+		hh_cookie[entry.split("=")[0]] = entry.split("=")[1]
+
+	return (mc_cookies, hh_cookie, hh_token)
+
+def store_cookies(mc_cookies, hh_cookie, hh_token):
+	# Stores cookies into a local file
+
+	dr = ""
+	if "win" in sys.platform:
+		# Windows
+		dr = os.path.join(os.getenv('APPDATA'), "moves2heia")
+	else:
+		dr = os.path.join(os.path.expanduser("~"), ".moves2heia")
+
+	try:
+		os.makedirs(dr)
+	except:
+		pass
+
+	hh_cookie_str = ""
+	for key in hh_cookie.keys()[:-1]:
+		hh_cookie_str += key + "=" + hh_cookie[key] + ", "
+	hh_cookie_str += hh_cookie.keys()[-1] + "=" + hh_cookie[hh_cookie.keys()[-1]]
+	
+	f = open(os.path.join(dr, "cookies"), "w")
+	f.write("; ".join(mc_cookies) + "\n")
+	f.write(hh_cookie_str + "\n")
+	f.write(hh_token + "\n")
+
+def uname_auth():
+	# Authenticates to movescount and heiaheia with username + password
 	movescount_uname = None
 	movescount_pw = None
 	heiaheia_uname = None
 	heiaheia_pw = None
-
-	if len(sys.argv) == 2 and sys.argv[1] == "-h":
-		print "Usage: %s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]" % sys.argv[0]
-		sys.exit(0)
 
 	if len(sys.argv) > 1:
 		movescount_uname = sys.argv[1]
@@ -325,6 +367,32 @@ def main():
 	print "Movescount authenticated"
 	hh_token, hh_cookie = hh_authenticate(heiaheia_uname, heiaheia_pw)
 	print "Heiaheia authenticated"
+
+	return (mc_cookies, hh_cookie, hh_token)
+
+def main():
+
+	cookies_read = False
+	cookies_used = False
+
+	if len(sys.argv) == 2 and sys.argv[1] == "-h":
+		print "Usage: %s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]][-c (cookie auth)]" % sys.argv[0]
+		sys.exit(0)
+
+	try:
+		mc_cookies, hh_cookie, hh_token = get_cookies()
+		cookies_read = True
+	except:
+		pass
+
+	if cookies_read:
+		use_cookies = raw_input("Cookies available on filesystem, use them and skip password authentication? (Cookies get obsolete at some point) [Y/N]: ")
+		if use_cookies.strip() != "Y":
+			mc_cookies, hh_cookie, hh_token = uname_auth()
+			cookies_used = True
+	else:
+		mc_cookies, hh_cookie, hh_token = uname_auth()
+
 	moves = get_scoreboard(mc_cookies)
 	print "Scoreboard fetched"
 	print_moves(moves)
@@ -334,9 +402,14 @@ def main():
 	get_gpx(mc_cookies, move)
 	print "GPX fetched"
 
-	comment = raw_input("A comment for your training:\n")
+	comment = raw_input("A comment for your training:\n").decode(sys.stdin.encoding)
 
 	hh_post_training(hh_token, hh_cookie, move, comment)
 	print "Training posted"
+
+	if not cookies_used:
+		store_cookie = raw_input("Store the cookies to skip passwords next time (stored in clear text)? [Y/N]: ")
+		if store_cookie.strip() == "Y":
+			store_cookies(mc_cookies, hh_cookie, hh_token)
 
 main()
