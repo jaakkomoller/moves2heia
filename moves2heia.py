@@ -3,6 +3,9 @@
 import sys, urllib, urllib2, poster, StringIO, datetime, os
 from HTMLParser import HTMLParser
 
+project = "moves2heia"
+version = "1.0"
+
 class Move:
 	def __init__(self):
 		self.date = datetime.date(1984, 6, 28)
@@ -374,6 +377,8 @@ def main():
 
 	cookies_read = False
 	cookies_used = False
+
+	print "%s version %s starting.." % (project, version)
 
 	if len(sys.argv) == 2 and sys.argv[1] == "-h":
 		print "Usage: %s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]][-c (cookie auth)]" % sys.argv[0]
