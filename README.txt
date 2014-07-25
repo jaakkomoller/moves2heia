@@ -1,7 +1,13 @@
 
 Usage:
 
-python moves2heia.py [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]
+On Windows:
+
+moves2heia [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]
+
+On Linux:
+
+./moves2heia.py [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]]
 
 Known bugs:
 
