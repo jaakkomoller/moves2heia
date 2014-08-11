@@ -394,6 +394,7 @@ def main():
 		use_cookies = raw_input("Cookies available on filesystem, use them and skip password authentication? (Cookies get obsolete at some point) [Y/N]: ")
 		if use_cookies.strip().upper() != "Y":
 			mc_cookies, hh_cookie, hh_token = uname_auth()
+		else:
 			cookies_used = True
 	else:
 		mc_cookies, hh_cookie, hh_token = uname_auth()
