@@ -7,7 +7,12 @@ project = "moves2heia"
 version = "1.01"
 
 class Move:
+	class Type:
+		RUNNING = 1
+		CYCLING = 2
+		SWIMMING = 3
 	def __init__(self):
+		self.act_type = -1
 		self.date = datetime.date(1984, 6, 28)
 		self.path = ""
 		self.duration = ""
@@ -16,6 +21,17 @@ class Move:
 		self.speed = ""
 		self.pace = ""
 		self.gpx = ""
+
+	def get_hh_sport(self):
+		"Returns heiaheia sport number"
+		if self.act_type == Move.Type.RUNNING:
+			return 1
+		elif self.act_type == Move.Type.CYCLING:
+			return 2
+		elif self.act_type == Move.Type.SWIMMING:
+			return 13
+		else:
+			return 14 # Default to walking
 
 	def __repr__(self):
 		return "Date: %s, path: %s, dur: %s, bpm: %d, len: %.2f, speed: %s" % (self.date.strftime("%d.%m.%Y"), self.path, self.duration, self.bpm, self.len, self.speed)
@@ -104,6 +120,16 @@ def get_scoreboard(cookies):
 				for entry in attrs:
 					if "href" in entry[0]:
 						moves[-1].path = entry[1]
+			elif self.in_table and "title" in [entry[0] for entry in attrs]:
+				for entry in attrs:
+					if "title" in entry[0]:
+						moves.append(Move())
+						if ("running" == entry[1] or "juoksu" == entry[1]):
+							moves[-1].act_type = Move.Type.RUNNING
+						elif ("cycling" == entry[1] or "Py" == entry[1][:2]):
+							moves[-1].act_type = Move.Type.CYCLING
+						elif ("swimming" == entry[1] or "uinti" == entry[1]):
+							moves[-1].act_type = Move.Type.SWIMMING
 		def handle_endtag(self, tag):
 			if tag == "ul" and self.in_table and self.ul_cnt == 0:
 				self.in_table = False
@@ -115,9 +141,8 @@ def get_scoreboard(cookies):
 			if self.in_table and self.ul_cnt == 1 and len(data) != 0:
 				#print "Encountered some data  :", data
 				if len(data.split(".")) == 3:
-					moves.append(Move())
 					moves[-1].date = datetime.date(int(data.split(".")[2]), int(data.split(".")[1]), int(data.split(".")[0]))
-				elif "tuntia" in data:
+				elif "tuntia" in data or "hours" in data:
 					moves[-1].duration = data.split(" ")[0]
 				elif "bpm" in data:
 					moves[-1].bpm = int(data.split(" ")[0])
@@ -237,7 +262,7 @@ def hh_post_training(token, cookie, move, comment):
 	params = [ \
 	("utf8" , u"\u2713"),
 	("authenticity_token" , token),
-	("training_log[sport]" , "148"),
+	("training_log[sport]" , str(move.get_hh_sport())),
 	("training_log[date]" , move.date.strftime("%d.%m.%Y")),
 	("training_log[duration_h]" , move.duration.split(":")[0]),
 	("training_log[duration_m]" , move.duration.split(":")[1].split("'")[0]),
