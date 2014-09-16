@@ -33,8 +33,22 @@ class Move:
 		else:
 			return 14 # Default to walking
 
+	def get_sport_str(self):
+		"Returns the sport type in string"
+		if self.act_type == Move.Type.RUNNING:
+			return "running"
+		elif self.act_type == Move.Type.CYCLING:
+			return "cycling"
+		elif self.act_type == Move.Type.SWIMMING:
+			return "swimming"
+		else:
+			return "walking" # Default to walking
+
 	def __repr__(self):
 		return "Date: %s, path: %s, dur: %s, bpm: %d, len: %.2f, speed: %s" % (self.date.strftime("%d.%m.%Y"), self.path, self.duration, self.bpm, self.len, self.speed)
+
+	def __str__(self):
+		return "%10s %8s %10s %4d %6.2f %7s" % (self.date.strftime("%d.%m.%Y"), self.get_sport_str(), self.duration, self.bpm, self.len, self.pace)
 
 def mc_authenticate(username, password):
 	# Authenticate. Returns the cookies
@@ -124,12 +138,15 @@ def get_scoreboard(cookies):
 				for entry in attrs:
 					if "title" in entry[0]:
 						moves.append(Move())
-						if ("running" == entry[1] or "juoksu" == entry[1]):
+						sprt = entry[1].lower()
+						if ("running" == sprt or "juoksu" == sprt):
 							moves[-1].act_type = Move.Type.RUNNING
-						elif ("cycling" == entry[1] or "Py" == entry[1][:2]):
+						elif ("cycling" == sprt or "py" == sprt[:2]):
 							moves[-1].act_type = Move.Type.CYCLING
-						elif ("swimming" == entry[1] or "uinti" == entry[1]):
+						elif ("swimming" == sprt or "uinti" == sprt):
 							moves[-1].act_type = Move.Type.SWIMMING
+						else:
+							print "Unknown sport encountered: " + entry[1]
 		def handle_endtag(self, tag):
 			if tag == "ul" and self.in_table and self.ul_cnt == 0:
 				self.in_table = False
@@ -160,9 +177,9 @@ def get_scoreboard(cookies):
 	return moves
 
 def print_moves(moves):
-	print "         Date   Duration  bpm     km  min/km"
+	print "         Date    Sport   Duration  bpm     km  min/km"
 	for i, move in enumerate(moves):
-		print "%d. %10s %10s %4d %6.2f %7s %s" % (i+1, move.date.strftime("%d.%m.%Y"), move.duration, move.bpm, move.len, move.pace, move.path)
+		print "%d. %s" % (i+1, str(move))
 	print ""
 
 def hh_authenticate(username, password):
