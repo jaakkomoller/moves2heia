@@ -112,7 +112,7 @@ def get_scoreboard(cookies):
 	headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 	headers["Accept-Language"] = "en-US,en;q=0.5"
 	headers["Referer"] = "http://www.movescount.com/fi/"
-	headers["Cookie"] = "; ".join(cookies) + "; Movescount_lang=11"
+	headers["Cookie"] = "; ".join(cookies) + "; Movescount_lang=9"
 	headers["Connection"] = "keep-alive"
 
 	req = urllib2.Request("http://www.movescount.com/fi/scoreboard", headers = headers)
@@ -328,7 +328,7 @@ def get_gpx(cookies, move):
 	headers["User-Agent"] = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0"
 	headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 	headers["Accept-Language"] = "en-US,en;q=0.5"
-	headers["Cookie"] = "; ".join(cookies) + "; Movescount_lang=11"
+	headers["Cookie"] = "; ".join(cookies) + "; Movescount_lang=9"
 	headers["Connection"] = "keep-alive"
 	headers["Referer"] = "http://www.movescount.com/" + move.path
 
@@ -433,8 +433,8 @@ def main():
 		pass
 
 	if cookies_read:
-		use_cookies = raw_input("Cookies available on filesystem, use them and skip password authentication? (Cookies get obsolete at some point) [y/N]: ")
-		if use_cookies.strip().upper() != "Y":
+		use_cookies = raw_input("Cookies available on filesystem, use them and skip password authentication? (Cookies get obsolete at some point) [Y/n]: ")
+		if use_cookies.strip().upper() == "N":
 			mc_cookies, hh_cookie, hh_token = uname_auth()
 		else:
 			cookies_used = True
@@ -456,8 +456,8 @@ def main():
 	print "Training posted"
 
 	if not cookies_used:
-		store_cookie = raw_input("Store the cookies to skip passwords next time (stored in clear text)? [y/N]: ")
-		if store_cookie.strip().upper() == "Y":
+		store_cookie = raw_input("Store the cookies to skip passwords next time (stored in clear text)? [Y/n]: ")
+		if store_cookie.strip().upper() != "N":
 			store_cookies(mc_cookies, hh_cookie, hh_token)
 
 main()
