@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, urllib, urllib2, poster, StringIO, datetime, os
+import sys, urllib, urllib2, poster, StringIO, datetime, os, getpass
 from HTMLParser import HTMLParser
 
 project = "moves2heia"
@@ -402,11 +402,11 @@ def uname_auth():
 	if not movescount_uname:
 		movescount_uname = raw_input("Movescount username: ")
 	if not movescount_pw:
-		movescount_pw = raw_input("Movescount password: ")
+		movescount_pw = getpass.getpass("Movescount password: ")
 	if not heiaheia_uname:
 		heiaheia_uname = raw_input("Heiaheia username: ")
 	if not heiaheia_pw:
-		heiaheia_pw = raw_input("Heiaheia password: ")
+		heiaheia_pw = getpass.getpass("Heiaheia password: ")
 
 	mc_cookies = mc_authenticate(movescount_uname, movescount_pw)
 	print "Movescount authenticated"
@@ -421,6 +421,7 @@ def main():
 	cookies_used = False
 
 	print "%s version %s starting.." % (project, version)
+	print "Cancel at any time by pressing CTRL+C"
 
 	if len(sys.argv) == 2 and sys.argv[1] == "-h":
 		print "Usage: %s [movescount_uname [movescount_pw [heiaheia_uname [heiaheia_pw]]]][-c (cookie auth)]" % sys.argv[0]
