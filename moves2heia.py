@@ -4,7 +4,7 @@ import sys, urllib, urllib2, poster, StringIO, datetime, os
 from HTMLParser import HTMLParser
 
 project = "moves2heia"
-version = "1.02"
+version = "1.03"
 
 class Move:
 	class Type:
